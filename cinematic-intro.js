@@ -93,13 +93,17 @@
 
   function init() {
     const config = window.PERFECT_MENS_CONFIG || {};
-    let videoPath = typeof config.storefrontVideoUrl === "string" ? config.storefrontVideoUrl.trim() : "";
-    if (window.innerWidth <= 768 && typeof config.storefrontVideoMobileUrl === "string" && config.storefrontVideoMobileUrl.trim()) {
+    const isMobile = window.innerWidth <= 768;
+    let videoPath = "";
+    if (isMobile && typeof config.storefrontVideoMobileUrl === "string" && config.storefrontVideoMobileUrl.trim()) {
       videoPath = config.storefrontVideoMobileUrl.trim();
+    } else if (typeof config.storefrontVideoUrl === "string" && config.storefrontVideoUrl.trim()) {
+      videoPath = config.storefrontVideoUrl.trim();
     }
-    if (!videoPath) videoPath = "assets/storefront-intro.mp4";
+    if (!videoPath) videoPath = isMobile ? "assets/storefront-intro-mobile.mp4" : "assets/storefront-intro.mp4";
 
     video.src = videoPath;
+    video.poster = isMobile ? "assets/storefront-mobile.webp" : "assets/storefront.webp";
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
@@ -115,6 +119,9 @@
     });
 
     const onMeta = () => {
+      try {
+        video.currentTime = 0.001;
+      } catch (e) {}
       onScroll();
     };
 
