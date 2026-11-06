@@ -902,3 +902,44 @@ html[lang="mr"] h1, html[lang="mr"] h2, html[lang="mr"] h3 { font-family: var(--
   .admin-product-form { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 15px; }
   html[lang="mr"] .admin-product-form { grid-template-columns: 1fr; }
 }
+
+/* Cinematic scroll improvements */
+.intro-scroll,
+.cinematic-scroll-track {
+  position: relative;
+  height: 250vh;
+  width: 100%;
+}
+
+.intro-sticky,
+.cinematic-intro {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.intro-video,
+.cinematic-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Remove animation lag from scroll-controlled overlays */
+.intro-opening-copy,
+.cinematic-opening-copy,
+.intro-brand,
+.cinematic-brand {
+  transition: none !important;
+}
+
