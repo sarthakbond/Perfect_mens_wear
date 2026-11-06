@@ -206,8 +206,8 @@
 
     video.pause();
     video.removeAttribute("src");
-    video.src = videoPath + "?v=12";
-    video.poster = posterPath + "?v=12";
+    video.src = videoPath + "?v=13";
+    video.poster = posterPath + "?v=13";
 
     video.muted = true;
     video.defaultMuted = true;

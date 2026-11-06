@@ -920,6 +920,7 @@ html[lang="mr"] h1, html[lang="mr"] h2, html[lang="mr"] h3 { font-family: var(--
   height: 100svh;
   overflow: hidden;
   z-index: 10;
+  background: var(--brown-deep);
 }
 
 .intro-video,
@@ -933,6 +934,34 @@ html[lang="mr"] h1, html[lang="mr"] h2, html[lang="mr"] h3 { font-family: var(--
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@media (max-width: 768px) {
+  .intro-video,
+  .cinematic-video {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    inset: auto 0;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    transform: translateY(-50%);
+    object-fit: contain;
+  }
+
+  .intro-grade,
+  .cinematic-grade {
+    background: linear-gradient(
+      180deg,
+      #140d0b 0%,
+      rgba(20, 13, 11, 0.75) 15%,
+      transparent 30%,
+      transparent 70%,
+      rgba(20, 13, 11, 0.75) 85%,
+      #140d0b 100%
+    );
+  }
 }
 
 /* Remove animation lag from scroll-controlled overlays */
