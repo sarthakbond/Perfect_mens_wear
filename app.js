@@ -54,6 +54,7 @@
     "JUST LANDED": "नवीन आगमन",
     "New arrivals.": "नवीन आगमन.",
     "Explore new styles": "नवीन शैली पाहा",
+    "Chat on WhatsApp": "WhatsApp वर संपर्क",
     "CUSTOMER FAVOURITES": "ग्राहकांची आवड",
     "Bestsellers.": "लोकप्रिय उत्पादने.",
     "Shop favourites": "आवडती उत्पादने पाहा",
@@ -335,7 +336,13 @@
 
     overlays.innerHTML = `
       <div class="toast-region" aria-live="polite" aria-atomic="true"></div>
-      <button class="floating-whatsapp whatsapp-action" type="button" aria-label="Message Perfect Mens Wear on WhatsApp">↗</button>
+      <button class="floating-whatsapp whatsapp-action" type="button" aria-label="Message Perfect Mens Wear on WhatsApp">
+        <span class="floating-whatsapp-pulse" aria-hidden="true"></span>
+        <svg class="whatsapp-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.15C10.57 20.15 9.12 19.75 7.85 19L7.55 18.82L4.43 19.64L5.26 16.6L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.59 20.15 12.05 20.15ZM16.57 14.34C16.32 14.21 15.1 13.61 14.88 13.53C14.65 13.45 14.49 13.41 14.32 13.66C14.16 13.9 13.69 14.46 13.54 14.62C13.4 14.79 13.26 14.81 13.01 14.68C12.76 14.56 11.97 14.3 11.03 13.46C10.3 12.81 9.8 12.01 9.66 11.76C9.52 11.51 9.64 11.38 9.77 11.25C9.88 11.14 10.02 10.96 10.14 10.82C10.27 10.68 10.31 10.57 10.39 10.41C10.47 10.24 10.43 10.1 10.37 9.98C10.31 9.85 9.81 8.63 9.61 8.13C9.41 7.65 9.2 7.71 9.05 7.71C8.91 7.7 8.74 7.7 8.58 7.7C8.41 7.7 8.14 7.76 7.91 8.01C7.68 8.26 7.03 8.87 7.03 10.12C7.03 11.37 7.94 12.57 8.07 12.74C8.2 12.91 9.85 15.46 12.38 16.55C12.98 16.81 13.45 16.97 13.82 17.08C14.42 17.27 14.97 17.25 15.4 17.18C15.89 17.11 16.9 16.57 17.11 15.99C17.32 15.41 17.32 14.92 17.25 14.81C17.19 14.7 17.02 14.64 16.77 14.51L16.57 14.34Z"/>
+        </svg>
+        <span class="floating-whatsapp-text">${t("Chat on WhatsApp")}</span>
+      </button>
       <div class="drawer-backdrop" data-drawer-backdrop hidden></div>
       <aside class="order-drawer" data-order-drawer role="dialog" aria-modal="true" aria-labelledby="drawer-heading" aria-hidden="true">
         <div class="drawer-header"><div><p class="eyebrow">YOUR SELECTION</p><h2 id="drawer-heading">Your order</h2></div><button type="button" class="icon-button drawer-close" aria-label="Close order">×</button></div>
@@ -542,7 +549,7 @@
         <div class="product-meta"><span>${escapeHtml(product.brand)}</span><span>${escapeHtml(productText(product, "category"))}</span></div>
         <h3>${escapeHtml(productText(product, "name"))}</h3>
         <div class="product-price"><strong>${formatPrice(product.price)}</strong>${mrp}</div>
-        <button type="button" class="product-enquiry-button" data-product-enquiry="${escapeHtml(product.id)}">${t("Enquire on WhatsApp")} <span aria-hidden="true">↗</span></button>
+        <button type="button" class="product-enquiry-button" data-product-enquiry="${escapeHtml(product.id)}"><svg class="btn-whatsapp-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 20.15C10.57 20.15 9.12 19.75 7.85 19L7.55 18.82L4.43 19.64L5.26 16.6L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.8 7.37 7.5 3.67 12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.59 20.15 12.05 20.15ZM16.57 14.34C16.32 14.21 15.1 13.61 14.88 13.53C14.65 13.45 14.49 13.41 14.32 13.66C14.16 13.9 13.69 14.46 13.54 14.62C13.4 14.79 13.26 14.81 13.01 14.68C12.76 14.56 11.97 14.3 11.03 13.46C10.3 12.81 9.8 12.01 9.66 11.76C9.52 11.51 9.64 11.38 9.77 11.25C9.88 11.14 10.02 10.96 10.14 10.82C10.27 10.68 10.31 10.57 10.39 10.41C10.47 10.24 10.43 10.1 10.37 9.98C10.31 9.85 9.81 8.63 9.61 8.13C9.41 7.65 9.2 7.71 9.05 7.71C8.91 7.7 8.74 7.7 8.58 7.7C8.41 7.7 8.14 7.76 7.91 8.01C7.68 8.26 7.03 8.87 7.03 10.12C7.03 11.37 7.94 12.57 8.07 12.74C8.2 12.91 9.85 15.46 12.38 16.55C12.98 16.81 13.45 16.97 13.82 17.08C14.42 17.27 14.97 17.25 15.4 17.18C15.89 17.11 16.9 16.57 17.11 15.99C17.32 15.41 17.32 14.92 17.25 14.81C17.19 14.7 17.02 14.64 16.77 14.51L16.57 14.34Z"/></svg> <span>${t("Enquire on WhatsApp")} ↗</span></button>
         <div class="product-card-actions">
           <label class="sr-only" for="size-${escapeHtml(product.id)}">${t("Size for")} ${escapeHtml(productText(product, "name"))}</label>
           <select id="size-${escapeHtml(product.id)}" data-product-size="${escapeHtml(product.id)}" aria-label="${t("Size for")} ${escapeHtml(productText(product, "name"))}">${sizes}</select>

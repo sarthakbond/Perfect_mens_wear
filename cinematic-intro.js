@@ -1,208 +1,178 @@
 (() => {
   "use strict";
 
-  const completionKey = "perfect-mens-wear-intro-complete-v1";
   const track = document.querySelector("[data-cinematic-track]");
   const scene = document.querySelector("[data-cinematic-intro]");
   const video = document.querySelector("[data-cinematic-video]");
   const skipButton = document.querySelector("[data-cinematic-skip]");
   const enterButton = document.querySelector("[data-cinematic-cue]");
-  const playButton = document.querySelector("[data-cinematic-play]");
   const brand = document.querySelector("[data-cinematic-brand]");
-  if (!track || !scene || !video || !skipButton || !enterButton || !playButton || !brand) return;
+  const openingCopy = document.querySelector("[data-cinematic-opening]");
+  const divider = document.querySelector("[data-cinematic-divider]");
 
-  let disposed = false;
-  let metadataTimeout = 0;
-  let brandTimeout = 0;
-  let revealTimeline;
+  if (!track || !scene || !video || !skipButton || !enterButton || !brand) return;
 
-  function recordCompletion() {
-    try {
-      sessionStorage.setItem(completionKey, "true");
-    } catch (error) {
-      console.warn("The intro completion state could not be saved for this session.", error);
+  let targetTime = 0;
+  let isTicking = false;
+  // The first 5.5 seconds contain the camera moving into the store
+  const maxCameraZoomSeconds = 5.5;
+
+  function getScrollProgress() {
+    const trackRect = track.getBoundingClientRect();
+    const scrollableDistance = track.offsetHeight - window.innerHeight;
+    if (scrollableDistance <= 0) return 0;
+    const progress = -trackRect.top / scrollableDistance;
+    return Math.max(0, Math.min(1, progress));
+  }
+
+  function applyFrame() {
+    // Keep video currentTime in sync with scroll position
+    if (Math.abs(video.currentTime - targetTime) > 0.04) {
+      try {
+        if ("fastSeek" in video) {
+          video.fastSeek(targetTime);
+        } else {
+          video.currentTime = targetTime;
+        }
+      } catch (e) {
+        // Fallback for browsers that throw during rapid seeks
+        video.currentTime = targetTime;
+      }
+    }
+    isTicking = false;
+  }
+
+  function requestFrameUpdate() {
+    if (!isTicking) {
+      isTicking = true;
+      requestAnimationFrame(applyFrame);
     }
   }
 
-  function cleanup() {
-    if (metadataTimeout) window.clearTimeout(metadataTimeout);
-    metadataTimeout = 0;
-    if (brandTimeout) window.clearTimeout(brandTimeout);
-    brandTimeout = 0;
-    revealTimeline?.kill();
-    revealTimeline = undefined;
-    video.pause();
-    video.removeEventListener("ended", revealBrand);
-    video.removeEventListener("error", handleVideoError);
-    playButton.removeEventListener("click", playIntro);
-    enterButton.removeEventListener("click", finishIntro);
-    skipButton.removeEventListener("click", finishIntro);
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-    window.removeEventListener("wheel", handleScrollToEnter);
-    window.removeEventListener("touchmove", handleScrollToEnter);
-    window.removeEventListener("pagehide", handlePageHide);
-    window.removeEventListener("pageshow", handlePageShow);
-  }
+  function handleScroll() {
+    const progress = getScrollProgress();
 
-  function finishIntro(resetPosition = true) {
-    if (disposed) return;
-    recordCompletion();
-    disposed = true;
-    cleanup();
-    track.remove();
-    if (resetPosition) window.scrollTo({ top: 0, behavior: "instant" });
-    document.querySelector("#site-header a, #main-content")?.focus({ preventScroll: true });
-  }
+    // 1. Visibly zoom the camera forward through the doors into the store (1.0x -> 1.55x zoom)
+    const zoomScale = 1 + progress * 0.55;
+    video.style.transform = `scale(${zoomScale.toFixed(3)}) translateZ(0)`;
 
-  function handleScrollToEnter() {
-    finishIntro(false);
-  }
+    // 2. Scrub video through the active camera entrance (0.0s -> 5.5s)
+    const videoProgress = Math.min(1, progress / 0.72);
+    targetTime = videoProgress * maxCameraZoomSeconds;
+    requestFrameUpdate();
 
-  function handleVideoError() {
-    if (!disposed) {
-      console.warn("The storefront intro video could not be played. Showing the existing homepage.");
-      finishIntro();
+    // 3. Opening copy ("PERFECT MENS WEAR", "पुरंदर, पुणे")
+    // Fades out as the camera moves toward the entrance
+    if (openingCopy) {
+      if (progress < 0.22) {
+        const p = progress / 0.22;
+        openingCopy.style.opacity = String(1 - p);
+        openingCopy.style.transform = `translateY(${-p * 28}px)`;
+      } else {
+        openingCopy.style.opacity = "0";
+      }
+    }
+
+    // 4. Scroll cue button ("SCROLL TO ENTER ↓")
+    if (enterButton) {
+      if (progress < 0.08) {
+        enterButton.style.opacity = String(1 - progress / 0.08);
+        enterButton.style.pointerEvents = "auto";
+      } else {
+        enterButton.style.opacity = "0";
+        enterButton.style.pointerEvents = "none";
+      }
+    }
+
+    // 5. Brand heritage reveal ("PERFECT MENSWEAR", "EST. 1998", "STYLE • QUALITY • ELEGANCE")
+    // Appears after entering the store (0.35 -> 0.78)
+    if (brand) {
+      if (progress >= 0.32 && progress <= 0.82) {
+        let alpha = 1;
+        if (progress < 0.48) {
+          alpha = (progress - 0.32) / 0.16; // 0 -> 1
+        } else if (progress > 0.70) {
+          alpha = (0.82 - progress) / 0.12; // 1 -> 0
+        }
+        brand.style.opacity = String(Math.max(0, Math.min(1, alpha)));
+        const scale = 0.94 + 0.06 * Math.min(1, (progress - 0.32) / 0.16);
+        brand.style.transform = `scale(${scale})`;
+        brand.style.pointerEvents = alpha > 0.5 ? "auto" : "none";
+
+        if (divider) {
+          const divScale = Math.max(0, Math.min(1, (progress - 0.36) / 0.16));
+          divider.style.transform = `scaleX(${divScale})`;
+        }
+      } else {
+        brand.style.opacity = "0";
+        brand.style.pointerEvents = "none";
+        if (divider) divider.style.transform = "scaleX(0)";
+      }
+    }
+
+    // 6. Seamless dissolve into the site header and hero section
+    if (progress >= 0.80) {
+      const exitProgress = (progress - 0.80) / 0.20;
+      scene.style.opacity = String(Math.max(0, 1 - exitProgress));
+      scene.style.pointerEvents = exitProgress > 0.85 ? "none" : "auto";
+    } else {
+      scene.style.opacity = "1";
+      scene.style.pointerEvents = "auto";
     }
   }
 
-  function handlePageHide(event) {
-    if (event.persisted) {
-      video.pause();
-      return;
-    }
-    cleanup();
-  }
-
-  function handlePageShow() {
-    if (!disposed && video.paused && video.currentTime < video.duration && brand.getAttribute("aria-hidden") !== "false") {
-      playIntro();
-    }
-  }
-
-  function handleVisibilityChange() {
-    if (disposed) return;
-    if (document.visibilityState === "hidden") {
-      video.pause();
-    } else if (video.paused && video.currentTime < video.duration && brand.getAttribute("aria-hidden") !== "false") {
-      playIntro();
-    }
-  }
-
-  function playIntro() {
-    if (disposed) return;
-    video.muted = true;
-    const playRequest = video.play();
-    if (!playRequest || typeof playRequest.then !== "function") return;
-    playRequest.then(() => {
-      playButton.hidden = true;
-    }).catch((error) => {
-      if (error.name === "AbortError" || disposed) return;
-      console.info("Browser playback needs a user gesture to start the intro video.", error);
-      playButton.hidden = false;
+  function skipIntro() {
+    const targetY = track.offsetTop + track.offsetHeight;
+    window.scrollTo({
+      top: targetY,
+      behavior: "smooth"
     });
   }
 
-  function revealBrand() {
-    if (disposed || !window.gsap) {
-      if (!disposed) finishIntro();
-      return;
-    }
-    brand.setAttribute("aria-hidden", "false");
-    revealTimeline = gsap.timeline({
-      onComplete: () => {
-        brandTimeout = window.setTimeout(finishIntro, 900);
-      }
-    })
-      .set(brand, { autoAlpha: 0, y: 18 })
-      .to(".cinematic-grade", { autoAlpha: 0.88, duration: 0.5, ease: "power1.out" })
-      .to(brand, { autoAlpha: 1, y: 0, duration: 0.75, ease: "power2.out" })
-      .fromTo(".cinematic-brand-name", { letterSpacing: "0.2em" }, {
-        letterSpacing: "0.09em",
-        duration: 0.9,
-        ease: "power2.out"
-      }, "<")
-      .to("[data-cinematic-divider]", { scaleX: 1, duration: 0.55, ease: "power2.out" }, "-=0.35");
-  }
-
-  function startPlayback() {
+  function init() {
     track.removeAttribute("aria-hidden");
     scene.removeAttribute("aria-hidden");
-    gsap.set(scene, { autoAlpha: 1 });
-    gsap.set(brand, { autoAlpha: 0, y: 22 });
-    gsap.set("[data-cinematic-divider]", { scaleX: 0, transformOrigin: "center center" });
-    video.addEventListener("ended", revealBrand, { once: true });
-    video.addEventListener("error", handleVideoError, { once: true });
-    enterButton.addEventListener("click", finishIntro);
-    skipButton.addEventListener("click", finishIntro);
-    playButton.addEventListener("click", playIntro);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("wheel", handleScrollToEnter, { once: true, passive: true });
-    window.addEventListener("touchmove", handleScrollToEnter, { once: true, passive: true });
-    window.addEventListener("pagehide", handlePageHide);
-    window.addEventListener("pageshow", handlePageShow);
-
-    video.pause();
-    video.currentTime = 0;
-    playIntro();
-  }
-
-  function init() {
-    let alreadyComplete = false;
-    try {
-      alreadyComplete = sessionStorage.getItem(completionKey) === "true";
-    } catch (error) {
-      console.warn("The intro completion state could not be read for this session.", error);
-    }
-    if (alreadyComplete) {
-      track.remove();
-      return;
-    }
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const connection = navigator.connection;
-    const lowPerformance = connection?.saveData === true
-      || (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 2)
-      || (navigator.deviceMemory > 0 && navigator.deviceMemory <= 2);
-    if (reducedMotion || lowPerformance) {
-      track.remove();
-      return;
-    }
+    scene.style.visibility = "visible";
+    scene.style.opacity = "1";
 
     const config = window.PERFECT_MENS_CONFIG || {};
-    const videoPath = typeof config.storefrontVideoUrl === "string" ? config.storefrontVideoUrl.trim() : "";
-    if (!videoPath) {
-      console.info("Cinematic video intro skipped: configure storefrontVideoUrl in site-config.js.");
-      track.remove();
-      return;
+    let videoPath = typeof config.storefrontVideoUrl === "string" ? config.storefrontVideoUrl.trim() : "";
+    if (window.innerWidth <= 768 && typeof config.storefrontVideoMobileUrl === "string" && config.storefrontVideoMobileUrl.trim()) {
+      videoPath = config.storefrontVideoMobileUrl.trim();
     }
+    if (!videoPath) videoPath = "assets/storefront-intro.mp4";
 
     try {
       video.src = new URL(videoPath, window.location.href).href;
       const posterPath = typeof config.storefrontImageUrl === "string" ? config.storefrontImageUrl.trim() : "";
       if (posterPath) video.poster = new URL(posterPath, window.location.href).href;
-    } catch (error) {
-      console.warn("A configured cinematic media URL is invalid.", error);
-      track.remove();
-      return;
+    } catch (e) {
+      console.warn("Could not set video source URL", e);
     }
 
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
     video.preload = "auto";
-    video.addEventListener("loadeddata", () => {
-      if (metadataTimeout) window.clearTimeout(metadataTimeout);
-      metadataTimeout = 0;
-      startPlayback();
-    }, { once: true });
-    video.addEventListener("error", handleVideoError, { once: true });
-    metadataTimeout = window.setTimeout(() => {
-      console.info("Cinematic video intro skipped because video data did not load in time.");
-      disposed = true;
-      cleanup();
-      track.remove();
-    }, 15000);
-    video.load();
+    video.pause();
+
+    const onMeta = () => {
+      video.currentTime = 0;
+      handleScroll();
+    };
+
+    if (video.readyState >= 1) {
+      onMeta();
+    } else {
+      video.addEventListener("loadedmetadata", onMeta, { once: true });
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
+    skipButton.addEventListener("click", skipIntro);
+    enterButton.addEventListener("click", skipIntro);
+
+    handleScroll();
   }
 
   if (document.readyState === "loading") {
