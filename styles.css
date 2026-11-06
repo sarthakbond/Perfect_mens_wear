@@ -68,7 +68,7 @@ h3 { font-family: var(--serif); font-weight: 500; }
 /* Scroll-driven luxury entrance */
 .intro-scroll, .cinematic-scroll-track {
   position: relative;
-  height: 220vh;
+  height: 250vh;
   width: 100%;
 }
 .intro-sticky, .cinematic-intro {
@@ -187,7 +187,7 @@ h3 { font-family: var(--serif); font-weight: 500; }
   backdrop-filter: blur(8px);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  transition: opacity .25s ease, background .2s ease, border-color .2s ease, transform .2s ease;
 }
 .intro-skip:hover, .cinematic-skip:hover {
   border-color: var(--gold);
@@ -611,34 +611,65 @@ h3 { font-family: var(--serif); font-weight: 500; }
   .collection-toolbar .button { min-height: 43px; }
   .filter-list { gap: 7px; margin: 25px 0 28px; }
   .filter-chip { min-height: 42px; padding-inline: 16px; font-size: 13px; font-weight: 600; }
-  .collection-section .product-grid { gap: 34px 14px; }
-  .product-card { display: flex; flex-direction: column; }
-  .product-card h3 { font-size: 17px; font-weight: 600; line-height: 1.35; margin: 6px 0 4px; }
-  .product-meta { font-size: 10px; letter-spacing: .08em; }
-  .product-price { font-size: 18px; margin: 4px 0 10px; }
-  .product-price strong { font-size: 19px; }
-  .product-price s { font-size: 14px; }
-  .product-enquiry-button {
-    margin-top: auto;
-    min-height: 44px;
-    padding-inline: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    gap: 8px;
+  .collection-section .product-grid { gap: 24px 12px; }
+  .product-card { display: flex; flex-direction: column; min-width: 0; }
+  .product-tag {
+    font-size: 8px !important;
+    padding: 3px 6px !important;
+    letter-spacing: .06em !important;
+    max-width: calc(100% - 46px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    top: 8px !important;
+    left: 8px !important;
   }
-  .product-enquiry-button .btn-whatsapp-icon { width: 18px; height: 18px; }
+  .wishlist-button {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 15px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+  .product-add { display: none !important; }
+  .product-card h3 {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    margin: 6px 0 4px !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    min-height: 2.6em;
+  }
+  .product-meta { font-size: 10px !important; letter-spacing: .08em !important; }
+  .product-price { font-size: 16px !important; margin: 4px 0 10px !important; gap: 8px !important; }
+  .product-price strong { font-size: 17px !important; }
+  .product-price s, .product-mrp { font-size: 13px !important; }
+  .product-enquiry-button {
+    margin-top: auto !important;
+    min-height: 40px !important;
+    padding-inline: 8px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+  }
+  .product-enquiry-button span { font-size: 12px !important; }
+  .product-enquiry-button .btn-whatsapp-icon { width: 16px !important; height: 16px !important; flex-shrink: 0; }
   .product-card-actions { display: none !important; }
   .product-details-link {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 6px 0;
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+    display: inline-block !important;
+    margin-top: 6px !important;
+    padding: 4px 0 !important;
+    color: var(--muted) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
   }
   .product-details-link:hover { color: var(--brown); }
   .story-section { padding-block: 65px; }

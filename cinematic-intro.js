@@ -12,6 +12,7 @@
 
   let isSeeking = false;
   let targetProgress = 0;
+  let currentProgress = 0;
   let rafId = null;
 
   function getScrollProgress() {
@@ -24,10 +25,13 @@
 
   function applyScrub() {
     rafId = null;
-    const duration = video.duration && !isNaN(video.duration) ? video.duration : 6.33;
-    const targetTime = targetProgress * duration;
 
-    // Direct frame seeking (ultra-smooth thanks to GOP=2 intra-frames)
+    // Hard ceiling: the entrance video stops strictly at 6.30s (inside store doors)
+    const rawDuration = video.duration && !isNaN(video.duration) ? video.duration : 6.30;
+    const maxDuration = Math.min(6.30, rawDuration);
+    const targetTime = Math.min(maxDuration, Math.max(0, targetProgress * maxDuration));
+
+    // Direct frame seeking with GOP=2 intra-frames for 0ms seek latency
     if (!isSeeking && Math.abs(video.currentTime - targetTime) > 0.03) {
       isSeeking = true;
       if ("fastSeek" in video) {
@@ -41,18 +45,20 @@
       }
     }
 
-    // Dynamic typography reveals tied to scroll
+    // Dynamic typography reveals tied to scroll progress
     if (openingCopy) {
-      if (targetProgress < 0.22) {
-        openingCopy.style.opacity = String(1 - targetProgress / 0.22);
+      if (targetProgress < 0.20) {
+        openingCopy.style.opacity = String(1 - targetProgress / 0.20);
+        openingCopy.style.transform = `translateY(${-targetProgress * 15}px)`;
       } else {
         openingCopy.style.opacity = "0";
       }
     }
 
+    // Scroll cue ("SCROLL TO ENTER ↓") fades out immediately once scrolling starts
     if (enterButton) {
-      if (targetProgress < 0.12) {
-        enterButton.style.opacity = String(1 - targetProgress / 0.12);
+      if (targetProgress < 0.10) {
+        enterButton.style.opacity = String(1 - targetProgress / 0.10);
         enterButton.style.pointerEvents = "auto";
       } else {
         enterButton.style.opacity = "0";
@@ -60,15 +66,27 @@
       }
     }
 
+    // Skip button fades out before website header arrives so it NEVER hovers over the navbar
+    if (skipButton) {
+      if (targetProgress >= 0.85) {
+        skipButton.style.opacity = "0";
+        skipButton.style.pointerEvents = "none";
+      } else {
+        skipButton.style.opacity = "1";
+        skipButton.style.pointerEvents = "auto";
+      }
+    }
+
+    // Brand heritage overlay ("PERFECT MENSWEAR / EST. 1998")
     if (brand) {
       if (targetProgress >= 0.22 && targetProgress <= 0.72) {
-        let a = 1;
+        let alpha = 1;
         if (targetProgress < 0.38) {
-          a = (targetProgress - 0.22) / 0.16;
+          alpha = (targetProgress - 0.22) / 0.16;
         } else if (targetProgress > 0.58) {
-          a = (0.72 - targetProgress) / 0.14;
+          alpha = (0.72 - targetProgress) / 0.14;
         }
-        brand.style.opacity = String(Math.max(0, Math.min(1, a)));
+        brand.style.opacity = String(Math.max(0, Math.min(1, alpha)));
       } else {
         brand.style.opacity = "0";
       }
@@ -100,10 +118,12 @@
     } else if (typeof config.storefrontVideoUrl === "string" && config.storefrontVideoUrl.trim()) {
       videoPath = config.storefrontVideoUrl.trim();
     }
-    if (!videoPath) videoPath = isMobile ? "assets/storefront-intro-mobile.mp4" : "assets/storefront-intro.mp4";
+    if (!videoPath) videoPath = isMobile ? "assets/storefront-mobile-v2.mp4" : "assets/storefront-entrance-v2.mp4";
 
-    video.src = videoPath;
-    video.poster = isMobile ? "assets/storefront-mobile.webp" : "assets/storefront.webp";
+    const posterPath = isMobile ? "assets/storefront-mobile-poster.webp" : "assets/storefront-entrance-poster.webp";
+
+    video.src = videoPath + "?v=11";
+    video.poster = posterPath + "?v=11";
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
@@ -111,8 +131,9 @@
 
     video.addEventListener("seeked", () => {
       isSeeking = false;
-      const duration = video.duration && !isNaN(video.duration) ? video.duration : 6.33;
-      const currentTarget = targetProgress * duration;
+      const rawDuration = video.duration && !isNaN(video.duration) ? video.duration : 6.30;
+      const maxDuration = Math.min(6.30, rawDuration);
+      const currentTarget = Math.min(maxDuration, Math.max(0, targetProgress * maxDuration));
       if (Math.abs(video.currentTime - currentTarget) > 0.05) {
         applyScrub();
       }
@@ -134,7 +155,7 @@
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
 
-    // Explicit exit controls
+    // Explicit exit controls only
     if (skipButton) skipButton.addEventListener("click", skipToWebsite);
     if (enterButton) enterButton.addEventListener("click", skipToWebsite);
 
