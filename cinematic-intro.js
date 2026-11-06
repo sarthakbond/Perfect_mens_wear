@@ -245,6 +245,13 @@
   }
 
   function init() {
+    if (!window.location.hash) {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    }
+
     initializeVideo();
 
     window.addEventListener("scroll", onScroll, {
