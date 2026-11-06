@@ -15,6 +15,7 @@
   let targetProgress = 0;
   let currentProgress = 0;
   let rafId = null;
+  let userHasScrolled = false;
 
   function getScrollProgress() {
     const scrollableDistance = track.offsetHeight - window.innerHeight;
@@ -25,19 +26,19 @@
   }
 
   function updateVideoFrame() {
-    // Smooth lerp towards targetProgress for silky smooth responsiveness
+    // Smooth lerp towards targetProgress for responsive feel without jumping
     const diff = targetProgress - currentProgress;
     if (Math.abs(diff) > 0.001) {
-      currentProgress += diff * 0.35;
+      currentProgress += diff * 0.28;
     } else {
       currentProgress = targetProgress;
     }
 
-    // Map scroll progress strictly across the entrance video (up until the shop opens up)
+    // Video duration is strictly the entrance (4.62s)
     const maxDuration = video.duration && !isNaN(video.duration) ? video.duration : 4.62;
     const targetTime = Math.min(maxDuration, Math.max(0, currentProgress * maxDuration));
 
-    if (!video.seeking && Math.abs(video.currentTime - targetTime) > 0.03) {
+    if (!video.seeking && Math.abs(video.currentTime - targetTime) > 0.04) {
       try {
         if ("fastSeek" in video) {
           video.fastSeek(targetTime);
@@ -49,11 +50,33 @@
       }
     }
 
-    // Zoom camera gracefully into store entrance as scroll progresses
+    // Camera zoom into store doors
     const isMobile = window.innerWidth <= 768;
-    const maxZoom = isMobile ? 0.20 : 0.30;
+    const maxZoom = isMobile ? 0.15 : 0.24;
     const zoomScale = 1 + currentProgress * maxZoom;
     video.style.transform = `scale(${zoomScale.toFixed(3)}) translateZ(0)`;
+
+    // Dissolve into website only as the video actually finishes approaching the entrance
+    // Tied to currentProgress so medium/fast scrolling does NOT cause the video to vanish prematurely!
+    if (currentProgress >= 0.72) {
+      const exitProgress = (currentProgress - 0.72) / 0.28;
+      scene.style.opacity = String(Math.max(0, 1 - exitProgress));
+      scene.style.pointerEvents = exitProgress > 0.85 ? "none" : "auto";
+    } else {
+      scene.style.opacity = "1";
+      scene.style.pointerEvents = "auto";
+    }
+
+    // Hide completely when scrolled down past intro
+    if (currentProgress >= 0.98 || targetProgress >= 0.99) {
+      scene.style.visibility = "hidden";
+      scene.style.pointerEvents = "none";
+      if (!video.paused) {
+        video.pause();
+      }
+    } else {
+      scene.style.visibility = "visible";
+    }
 
     if (Math.abs(targetProgress - currentProgress) > 0.002) {
       rafId = requestAnimationFrame(updateVideoFrame);
@@ -63,13 +86,14 @@
   }
 
   function handleScroll() {
+    userHasScrolled = true;
     const progress = getScrollProgress();
     targetProgress = progress;
 
     // 1. Opening copy ("PERFECT MENS WEAR", "पुरंदर, पुणे")
     if (openingCopy) {
-      if (progress < 0.22) {
-        const p = progress / 0.22;
+      if (progress < 0.20) {
+        const p = progress / 0.20;
         openingCopy.style.opacity = String(1 - p);
         openingCopy.style.transform = `translateY(${-p * 20}px)`;
       } else {
@@ -79,8 +103,8 @@
 
     // 2. Scroll cue button ("SCROLL TO ENTER ↓")
     if (enterButton) {
-      if (progress < 0.10) {
-        enterButton.style.opacity = String(1 - progress / 0.10);
+      if (progress < 0.08) {
+        enterButton.style.opacity = String(1 - progress / 0.08);
         enterButton.style.pointerEvents = "auto";
       } else {
         enterButton.style.opacity = "0";
@@ -90,12 +114,12 @@
 
     // 3. Brand heritage reveal ("EST. 1998", "STYLE • QUALITY • ELEGANCE")
     if (brand) {
-      if (progress >= 0.25 && progress <= 0.70) {
+      if (progress >= 0.25 && progress <= 0.72) {
         let alpha = 1;
         if (progress < 0.40) {
           alpha = (progress - 0.25) / 0.15;
-        } else if (progress > 0.58) {
-          alpha = (0.70 - progress) / 0.12;
+        } else if (progress > 0.60) {
+          alpha = (0.72 - progress) / 0.12;
         }
         brand.style.opacity = String(Math.max(0, Math.min(1, alpha)));
         const scale = 0.95 + 0.05 * Math.min(1, (progress - 0.25) / 0.15);
@@ -113,30 +137,35 @@
       }
     }
 
-    // 4. Seamless dissolve into the site header and hero section
-    if (progress >= 0.55) {
-      const exitProgress = (progress - 0.55) / 0.45;
-      scene.style.opacity = String(Math.max(0, 1 - exitProgress));
-      scene.style.pointerEvents = exitProgress > 0.8 ? "none" : "auto";
-    } else {
-      scene.style.opacity = "1";
-      scene.style.pointerEvents = "auto";
-    }
-
-    // 5. Hide completely when scrolled down past intro (stops any background execution)
-    if (progress >= 0.98) {
-      scene.style.visibility = "hidden";
-      scene.style.pointerEvents = "none";
-      if (!video.paused) {
-        video.pause();
-      }
-    } else {
-      scene.style.visibility = "visible";
-    }
-
-    // 6. Schedule frame update
     if (!rafId) {
       rafId = requestAnimationFrame(updateVideoFrame);
+    }
+  }
+
+  function playInitialMotion() {
+    if (userHasScrolled || window.scrollY > 20) return;
+    video.muted = true;
+    video.playsInline = true;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        const checkTime = () => {
+          if (userHasScrolled || window.scrollY > 20) {
+            video.pause();
+            return;
+          }
+          // Play smoothly for the first 1.2s so the opening is active cinema, never a static photo
+          if (video.currentTime >= 1.2) {
+            video.pause();
+            const maxDuration = video.duration || 4.62;
+            currentProgress = 1.2 / maxDuration;
+            targetProgress = getScrollProgress();
+          } else {
+            requestAnimationFrame(checkTime);
+          }
+        };
+        requestAnimationFrame(checkTime);
+      }).catch(() => {});
     }
   }
 
@@ -174,11 +203,10 @@
     video.defaultMuted = true;
     video.playsInline = true;
     video.preload = "auto";
-    video.pause(); // Strictly controlled by scroll!
 
     const onMeta = () => {
-      video.pause();
       handleScroll();
+      playInitialMotion();
     };
 
     if (video.readyState >= 1) {
