@@ -12,6 +12,10 @@
 
   if (!track || !scene || !video || !skipButton || !enterButton || !brand) return;
 
+  let targetProgress = 0;
+  let currentProgress = 0;
+  let rafId = null;
+
   function getScrollProgress() {
     const scrollableDistance = track.offsetHeight - window.innerHeight;
     if (scrollableDistance <= 0) return 1;
@@ -20,26 +24,52 @@
     return Math.max(0, Math.min(1, progress));
   }
 
-  function handleScroll() {
-    const progress = getScrollProgress();
-    const isMobile = window.innerWidth <= 768;
-
-    // 1. Smooth hardware-accelerated zoom into store entrance
-    // Mobile uses a gentle 1.18x zoom to preserve full storefront framing & text
-    // Desktop uses 1.28x zoom
-    const maxZoom = isMobile ? 0.18 : 0.28;
-    const zoomScale = 1 + progress * maxZoom;
-    video.style.transform = `scale(${zoomScale.toFixed(3)}) translateZ(0)`;
-
-    // 2. Playback speed acceleration on scroll (lag-free, zero seek stalls)
-    if (!video.paused) {
-      video.playbackRate = Math.min(2.5, 1 + progress * 1.5);
+  function updateVideoFrame() {
+    // Smooth lerp towards targetProgress for silky smooth responsiveness
+    const diff = targetProgress - currentProgress;
+    if (Math.abs(diff) > 0.001) {
+      currentProgress += diff * 0.35;
+    } else {
+      currentProgress = targetProgress;
     }
 
-    // 3. Opening copy ("PERFECT MENS WEAR", "पुरंदर, पुणे")
+    // Map scroll progress strictly across the entrance video (up until the shop opens up)
+    const maxDuration = video.duration && !isNaN(video.duration) ? video.duration : 4.62;
+    const targetTime = Math.min(maxDuration, Math.max(0, currentProgress * maxDuration));
+
+    if (!video.seeking && Math.abs(video.currentTime - targetTime) > 0.03) {
+      try {
+        if ("fastSeek" in video) {
+          video.fastSeek(targetTime);
+        } else {
+          video.currentTime = targetTime;
+        }
+      } catch (e) {
+        video.currentTime = targetTime;
+      }
+    }
+
+    // Zoom camera gracefully into store entrance as scroll progresses
+    const isMobile = window.innerWidth <= 768;
+    const maxZoom = isMobile ? 0.20 : 0.30;
+    const zoomScale = 1 + currentProgress * maxZoom;
+    video.style.transform = `scale(${zoomScale.toFixed(3)}) translateZ(0)`;
+
+    if (Math.abs(targetProgress - currentProgress) > 0.002) {
+      rafId = requestAnimationFrame(updateVideoFrame);
+    } else {
+      rafId = null;
+    }
+  }
+
+  function handleScroll() {
+    const progress = getScrollProgress();
+    targetProgress = progress;
+
+    // 1. Opening copy ("PERFECT MENS WEAR", "पुरंदर, पुणे")
     if (openingCopy) {
-      if (progress < 0.25) {
-        const p = progress / 0.25;
+      if (progress < 0.22) {
+        const p = progress / 0.22;
         openingCopy.style.opacity = String(1 - p);
         openingCopy.style.transform = `translateY(${-p * 20}px)`;
       } else {
@@ -47,10 +77,10 @@
       }
     }
 
-    // 4. Scroll cue button ("SCROLL TO ENTER ↓")
+    // 2. Scroll cue button ("SCROLL TO ENTER ↓")
     if (enterButton) {
-      if (progress < 0.12) {
-        enterButton.style.opacity = String(1 - progress / 0.12);
+      if (progress < 0.10) {
+        enterButton.style.opacity = String(1 - progress / 0.10);
         enterButton.style.pointerEvents = "auto";
       } else {
         enterButton.style.opacity = "0";
@@ -58,7 +88,7 @@
       }
     }
 
-    // 5. Brand heritage reveal ("EST. 1998", "STYLE • QUALITY • ELEGANCE")
+    // 3. Brand heritage reveal ("EST. 1998", "STYLE • QUALITY • ELEGANCE")
     if (brand) {
       if (progress >= 0.25 && progress <= 0.70) {
         let alpha = 1;
@@ -83,9 +113,9 @@
       }
     }
 
-    // 6. Seamless dissolve into the site header and hero section
-    if (progress >= 0.50) {
-      const exitProgress = (progress - 0.50) / 0.50;
+    // 4. Seamless dissolve into the site header and hero section
+    if (progress >= 0.55) {
+      const exitProgress = (progress - 0.55) / 0.45;
       scene.style.opacity = String(Math.max(0, 1 - exitProgress));
       scene.style.pointerEvents = exitProgress > 0.8 ? "none" : "auto";
     } else {
@@ -93,7 +123,7 @@
       scene.style.pointerEvents = "auto";
     }
 
-    // 7. Visibility and resource conservation at end of scroll
+    // 5. Hide completely when scrolled down past intro (stops any background execution)
     if (progress >= 0.98) {
       scene.style.visibility = "hidden";
       scene.style.pointerEvents = "none";
@@ -102,9 +132,11 @@
       }
     } else {
       scene.style.visibility = "visible";
-      if (video.paused && progress < 0.5) {
-        video.play().catch(() => {});
-      }
+    }
+
+    // 6. Schedule frame update
+    if (!rafId) {
+      rafId = requestAnimationFrame(updateVideoFrame);
     }
   }
 
@@ -142,26 +174,17 @@
     video.defaultMuted = true;
     video.playsInline = true;
     video.preload = "auto";
-    video.autoplay = true;
+    video.pause(); // Strictly controlled by scroll!
 
-    // Start playback immediately for silky-smooth 60fps streaming
-    const startPlay = () => {
-      const p = video.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          // Fallback if browser requires interaction
-        });
-      }
+    const onMeta = () => {
+      video.pause();
+      handleScroll();
     };
 
     if (video.readyState >= 1) {
-      startPlay();
-      handleScroll();
+      onMeta();
     } else {
-      video.addEventListener("loadedmetadata", () => {
-        startPlay();
-        handleScroll();
-      }, { once: true });
+      video.addEventListener("loadedmetadata", onMeta, { once: true });
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
