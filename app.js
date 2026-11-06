@@ -1044,17 +1044,30 @@
     const toggle = document.querySelector(".nav-toggle");
     const navigation = document.querySelector(".primary-nav");
     if (!toggle || !navigation) return;
-    toggle.addEventListener("click", () => {
+
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
       const expanded = toggle.getAttribute("aria-expanded") === "true";
       toggle.setAttribute("aria-expanded", String(!expanded));
       toggle.setAttribute("aria-label", expanded ? "Open menu" : "Close menu");
       navigation.classList.toggle("is-open", !expanded);
     });
+
     navigation.addEventListener("click", (event) => {
-      if (event.target instanceof HTMLAnchorElement) {
+      if (event.target instanceof HTMLAnchorElement || event.target.closest("a")) {
         toggle.setAttribute("aria-expanded", "false");
         toggle.setAttribute("aria-label", "Open menu");
         navigation.classList.remove("is-open");
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!navigation.contains(event.target) && !toggle.contains(event.target)) {
+        if (navigation.classList.contains("is-open")) {
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.setAttribute("aria-label", "Open menu");
+          navigation.classList.remove("is-open");
+        }
       }
     });
   }
