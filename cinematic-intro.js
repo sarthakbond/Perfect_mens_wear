@@ -1,96 +1,97 @@
 (() => {
   "use strict";
 
-  const track = document.querySelector("[data-cinematic-track]");
-  const scene = document.querySelector("[data-cinematic-intro]");
-  const video = document.querySelector("[data-cinematic-video]");
-  const skipButton = document.querySelector("[data-cinematic-skip]");
-  const enterButton = document.querySelector("[data-cinematic-cue]");
-  const brand = document.querySelector("[data-cinematic-brand]");
-  const openingCopy = document.querySelector("[data-cinematic-opening]");
-  const divider = document.querySelector("[data-cinematic-divider]");
+  const track = document.querySelector("[data-intro-track], [data-cinematic-track]");
+  const video = document.querySelector("[data-intro-video], [data-cinematic-video]");
+  const skipButton = document.querySelector("[data-intro-skip], [data-cinematic-skip]");
+  const enterButton = document.querySelector("[data-intro-cue], [data-cinematic-cue]");
+  const brand = document.querySelector("[data-intro-brand], [data-cinematic-brand]");
+  const openingCopy = document.querySelector("[data-intro-opening], [data-cinematic-opening]");
 
-  if (!track || !scene || !video) return;
+  if (!track || !video) return;
 
-  // If already viewed in this browser session, skip immediately without flash
-  try {
-    if (sessionStorage.getItem("pmw_intro_seen") === "true") {
-      track.style.display = "none";
-      track.setAttribute("hidden", "hidden");
-      return;
-    }
-  } catch (e) {}
+  let isSeeking = false;
+  let targetProgress = 0;
+  let rafId = null;
 
-  let isDismissed = false;
-
-  function dismissIntro() {
-    if (isDismissed) return;
-    isDismissed = true;
-
-    try {
-      sessionStorage.setItem("pmw_intro_seen", "true");
-    } catch (e) {}
-
-    // Animate out cleanly
-    track.classList.add("is-dismissed");
-    track.style.pointerEvents = "none";
-
-    try {
-      video.pause();
-    } catch (e) {}
-
-    // Cleanup listeners
-    window.removeEventListener("wheel", handleWheel);
-    window.removeEventListener("touchstart", handleTouchStart);
-    window.removeEventListener("touchmove", handleTouchMove);
-    window.removeEventListener("scroll", handleWindowScroll);
-
-    setTimeout(() => {
-      track.style.display = "none";
-      track.setAttribute("hidden", "hidden");
-      track.classList.remove("is-dismissed");
-    }, 400);
+  function getScrollProgress() {
+    const scrollDistance = track.offsetHeight - window.innerHeight;
+    if (scrollDistance <= 0) return 0;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const progress = (scrollY - track.offsetTop) / scrollDistance;
+    return Math.min(1, Math.max(0, progress));
   }
 
-  // Wheel interaction (user scrolling down)
-  function handleWheel(e) {
-    if (e.deltaY > 8) {
-      dismissIntro();
-    }
-  }
+  function applyScrub() {
+    rafId = null;
+    const duration = video.duration && !isNaN(video.duration) ? video.duration : 6.33;
+    const targetTime = targetProgress * duration;
 
-  // Touch gesture interaction (user swiping up to scroll down)
-  let touchStartY = 0;
-  function handleTouchStart(e) {
-    if (e.touches && e.touches[0]) {
-      touchStartY = e.touches[0].clientY;
+    // Direct frame seeking (ultra-smooth thanks to GOP=2 intra-frames)
+    if (!isSeeking && Math.abs(video.currentTime - targetTime) > 0.03) {
+      isSeeking = true;
+      if ("fastSeek" in video) {
+        try {
+          video.fastSeek(targetTime);
+        } catch (e) {
+          video.currentTime = targetTime;
+        }
+      } else {
+        video.currentTime = targetTime;
+      }
     }
-  }
 
-  function handleTouchMove(e) {
-    if (e.touches && e.touches[0]) {
-      const delta = touchStartY - e.touches[0].clientY;
-      if (delta > 16) {
-        dismissIntro();
+    // Dynamic typography reveals tied to scroll
+    if (openingCopy) {
+      if (targetProgress < 0.22) {
+        openingCopy.style.opacity = String(1 - targetProgress / 0.22);
+      } else {
+        openingCopy.style.opacity = "0";
+      }
+    }
+
+    if (enterButton) {
+      if (targetProgress < 0.12) {
+        enterButton.style.opacity = String(1 - targetProgress / 0.12);
+        enterButton.style.pointerEvents = "auto";
+      } else {
+        enterButton.style.opacity = "0";
+        enterButton.style.pointerEvents = "none";
+      }
+    }
+
+    if (brand) {
+      if (targetProgress >= 0.22 && targetProgress <= 0.72) {
+        let a = 1;
+        if (targetProgress < 0.38) {
+          a = (targetProgress - 0.22) / 0.16;
+        } else if (targetProgress > 0.58) {
+          a = (0.72 - targetProgress) / 0.14;
+        }
+        brand.style.opacity = String(Math.max(0, Math.min(1, a)));
+      } else {
+        brand.style.opacity = "0";
       }
     }
   }
 
-  // Native window scroll check
-  function handleWindowScroll() {
-    if ((window.scrollY || window.pageYOffset || 0) > 18) {
-      dismissIntro();
+  function onScroll() {
+    targetProgress = getScrollProgress();
+    if (!rafId) {
+      rafId = requestAnimationFrame(applyScrub);
     }
   }
 
-  function init() {
-    track.removeAttribute("aria-hidden");
-    track.removeAttribute("hidden");
-    scene.removeAttribute("aria-hidden");
-    track.style.display = "block";
-    track.style.opacity = "1";
-    track.style.visibility = "visible";
+  function skipToWebsite() {
+    const scrollDistance = track.offsetHeight - window.innerHeight;
+    const targetY = track.offsetTop + Math.max(0, scrollDistance) + 4;
+    window.scrollTo({
+      top: targetY,
+      behavior: "smooth"
+    });
+  }
 
+  function init() {
     const config = window.PERFECT_MENS_CONFIG || {};
     let videoPath = typeof config.storefrontVideoUrl === "string" ? config.storefrontVideoUrl.trim() : "";
     if (window.innerWidth <= 768 && typeof config.storefrontVideoMobileUrl === "string" && config.storefrontVideoMobileUrl.trim()) {
@@ -98,69 +99,40 @@
     }
     if (!videoPath) videoPath = "assets/storefront-intro.mp4";
 
-    try {
-      video.src = new URL(videoPath, window.location.href).href;
-      const posterPath = typeof config.storefrontImageUrl === "string" ? config.storefrontImageUrl.trim() : "";
-      if (posterPath) video.poster = new URL(posterPath, window.location.href).href;
-    } catch (e) {
-      video.src = videoPath;
-    }
-
+    video.src = videoPath;
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
-    video.autoplay = true;
     video.preload = "auto";
 
-    // Auto-advance entrance: video is 4.62s trimmed strictly to storefront entrance
-    // As the doors open (~4.4s), transition smoothly into the store
-    video.addEventListener("timeupdate", () => {
-      if (video.currentTime >= 4.4) {
-        dismissIntro();
+    video.addEventListener("seeked", () => {
+      isSeeking = false;
+      const duration = video.duration && !isNaN(video.duration) ? video.duration : 6.33;
+      const currentTarget = targetProgress * duration;
+      if (Math.abs(video.currentTime - currentTarget) > 0.05) {
+        applyScrub();
       }
     });
 
-    video.addEventListener("ended", dismissIntro);
+    const onMeta = () => {
+      onScroll();
+    };
 
-    // Gently fade brand motto in after opening glide (0.8s)
-    setTimeout(() => {
-      if (!isDismissed && brand) {
-        brand.style.opacity = "1";
-        brand.style.transform = "scale(1)";
-        if (divider) divider.style.transform = "scaleX(1)";
-      }
-    }, 750);
-
-    // Click / touch buttons
-    if (skipButton) skipButton.addEventListener("click", dismissIntro);
-    if (enterButton) enterButton.addEventListener("click", dismissIntro);
-
-    // User gesture listeners
-    window.addEventListener("wheel", handleWheel, { passive: true });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("scroll", handleWindowScroll, { passive: true });
-
-    // Begin native playback
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // If mobile browser blocks unmuted/autonomous play, tap anywhere to kickstart
-        scene.addEventListener("click", () => {
-          if (!isDismissed) video.play().catch(() => {});
-        }, { once: true });
-      });
+    if (video.readyState >= 1) {
+      onMeta();
+    } else {
+      video.addEventListener("loadedmetadata", onMeta, { once: true });
     }
-  }
 
-  // Allow replaying entrance if requested
-  window.pmwReplayIntro = function() {
-    try {
-      sessionStorage.removeItem("pmw_intro_seen");
-    } catch (e) {}
-    isDismissed = false;
-    init();
-  };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    // Explicit exit controls
+    if (skipButton) skipButton.addEventListener("click", skipToWebsite);
+    if (enterButton) enterButton.addEventListener("click", skipToWebsite);
+
+    onScroll();
+  }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });

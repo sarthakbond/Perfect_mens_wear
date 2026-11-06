@@ -28,38 +28,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Noto+Serif+Devanagari:wght@500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=7">
-    <script src="site-config.js?v=7" defer></script>
-    <script src="products.js?v=7" defer></script>
+    <link rel="stylesheet" href="styles.css?v=8">
+    <script src="site-config.js?v=8" defer></script>
+    <script src="products.js?v=8" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-    <script src="app.js?v=7" defer></script>
-    <script src="cinematic-intro.js?v=7" defer></script>
+    <script src="app.js?v=8" defer></script>
+    <script src="cinematic-intro.js?v=8" defer></script>
   </head>
   <body data-page="home">
-    <div class="cinematic-scroll-track" data-cinematic-track aria-hidden="true">
-      <section class="cinematic-intro" data-cinematic-intro aria-label="Perfect Mens Wear storefront entrance" aria-hidden="true">
-        <div class="cinematic-stage">
-          <video class="cinematic-video" data-cinematic-video muted playsinline preload="metadata" disablepictureinpicture tabindex="-1" aria-label="Cinematic view of the Perfect Mens Wear storefront"></video>
-          <div class="cinematic-grade"></div>
-          <div class="cinematic-opening-copy" data-cinematic-opening>
-            <p class="cinematic-identifier">PERFECT MENS WEAR</p>
-            <p class="cinematic-location" lang="mr">पुरंदर, पुणे</p>
-          </div>
-          <div class="cinematic-brand" data-cinematic-brand aria-hidden="true">
-            <p class="cinematic-brand-name"><span>PERFECT</span><span>MENSWEAR</span></p>
-            <span class="cinematic-divider" data-cinematic-divider></span>
-            <p class="cinematic-established">EST. 1998 <span aria-hidden="true">·</span> PURANDAR</p>
-            <p class="cinematic-motto">STYLE <span aria-hidden="true">•</span> QUALITY <span aria-hidden="true">•</span> ELEGANCE</p>
-          </div>
-          <button class="cinematic-scroll-cue" data-cinematic-cue type="button" aria-label="Scroll to enter the website">
-            <span>SCROLL TO ENTER</span>
-            <i aria-hidden="true">↓</i>
-          </button>
-          <button class="cinematic-play" data-cinematic-play type="button" hidden>Play intro</button>
-          <button class="cinematic-skip" data-cinematic-skip type="button">Skip intro</button>
+    <div class="intro-scroll cinematic-scroll-track" data-intro-track>
+      <div class="intro-sticky cinematic-intro" data-intro-sticky aria-label="Perfect Mens Wear storefront entrance">
+        <video class="intro-video cinematic-video" data-intro-video muted playsinline preload="auto" disablepictureinpicture tabindex="-1" aria-label="Cinematic view of the Perfect Mens Wear storefront"></video>
+        <div class="intro-grade cinematic-grade"></div>
+        <div class="intro-opening-copy cinematic-opening-copy" data-intro-opening>
+          <p class="intro-identifier cinematic-identifier">PERFECT MENS WEAR</p>
+          <p class="intro-location cinematic-location" lang="mr">पुरंदर, पुणे</p>
         </div>
-      </section>
+        <div class="intro-brand cinematic-brand" data-intro-brand aria-hidden="true">
+          <p class="intro-brand-name cinematic-brand-name"><span>PERFECT</span><span>MENSWEAR</span></p>
+          <span class="intro-divider cinematic-divider"></span>
+          <p class="intro-established cinematic-established">EST. 1998 <span aria-hidden="true">·</span> PURANDAR</p>
+          <p class="intro-motto cinematic-motto">STYLE <span aria-hidden="true">•</span> QUALITY <span aria-hidden="true">•</span> ELEGANCE</p>
+        </div>
+        <button class="intro-scroll-cue cinematic-scroll-cue" data-intro-cue type="button" aria-label="Scroll to enter the store">
+          <span>SCROLL TO ENTER</span>
+          <i aria-hidden="true">↓</i>
+        </button>
+        <button class="intro-skip cinematic-skip" data-intro-skip type="button">Skip intro</button>
+      </div>
     </div>
     <div class="storefront-home-content">
       <div id="site-header"></div>
