@@ -11,7 +11,7 @@ window.PERFECT_MENS_CONFIG = {
   storefrontImageUrl: "assets/storefront.webp",
   // Add the 9-second intro video at this path, or set a different relative/absolute URL.
   storefrontVideoUrl: "assets/storefront-intro.mp4",
-  storefrontVideoMobileUrl: "assets/storefront-intro-720p.mp4",
+  storefrontVideoMobileUrl: "assets/storefront-intro-mobile.mp4",
   instagramUrl: "",
   supabaseUrl: "",
   supabaseAnonKey: ""
