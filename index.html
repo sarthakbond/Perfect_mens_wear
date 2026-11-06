@@ -31,11 +31,39 @@
     <link rel="stylesheet" href="styles.css">
     <script src="site-config.js" defer></script>
     <script src="products.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="app.js" defer></script>
+    <script src="cinematic-intro.js" defer></script>
   </head>
   <body data-page="home">
-    <div id="site-header"></div>
-    <main id="main-content">
+    <div class="cinematic-scroll-track" data-cinematic-track aria-hidden="true">
+      <section class="cinematic-intro" data-cinematic-intro aria-label="Perfect Mens Wear storefront entrance" aria-hidden="true">
+        <div class="cinematic-stage">
+          <video class="cinematic-video" data-cinematic-video muted playsinline preload="metadata" disablepictureinpicture tabindex="-1" aria-label="Cinematic view of the Perfect Mens Wear storefront"></video>
+          <div class="cinematic-grade"></div>
+          <div class="cinematic-opening-copy" data-cinematic-opening>
+            <p class="cinematic-identifier">PERFECT MENS WEAR</p>
+            <p class="cinematic-location" lang="mr">पुरंदर, पुणे</p>
+          </div>
+          <div class="cinematic-brand" data-cinematic-brand aria-hidden="true">
+            <p class="cinematic-brand-name"><span>PERFECT</span><span>MENSWEAR</span></p>
+            <span class="cinematic-divider" data-cinematic-divider></span>
+            <p class="cinematic-established">EST. 1998 <span aria-hidden="true">·</span> PURANDAR</p>
+            <p class="cinematic-motto">STYLE <span aria-hidden="true">•</span> QUALITY <span aria-hidden="true">•</span> ELEGANCE</p>
+          </div>
+          <button class="cinematic-scroll-cue" data-cinematic-cue type="button" aria-label="Scroll to enter the website">
+            <span>SCROLL TO ENTER</span>
+            <i aria-hidden="true">↓</i>
+          </button>
+          <button class="cinematic-play" data-cinematic-play type="button" hidden>Play intro</button>
+          <button class="cinematic-skip" data-cinematic-skip type="button">Skip intro</button>
+        </div>
+      </section>
+    </div>
+    <div class="storefront-home-content">
+      <div id="site-header"></div>
+      <main id="main-content">
       <section class="hero">
         <div class="hero-image" role="img" aria-label="Editorial portrait of a man in classic menswear"></div>
         <div class="hero-shade"></div>
@@ -86,6 +114,13 @@
         </div>
       </section>
 
+      <section class="festival-section">
+        <div class="page-width festival-content">
+          <div><p class="eyebrow eyebrow-light">THE FESTIVE EDIT</p><h2>Make room for<br>the moments that matter.</h2><p>Explore occasion-ready styles and ask us about current availability.</p></div>
+          <a class="button button-outline-light" href="collection.html?category=Ethnic%20Wear">Explore festive styles <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
       <section class="featured-section section-padding">
         <div class="page-width">
           <div class="section-heading split-heading">
@@ -93,7 +128,29 @@
             <a class="text-link" href="collection.html">See the collection <span aria-hidden="true">↗</span></a>
           </div>
           <div class="product-grid product-grid-home" data-product-list="featured" data-limit="4"></div>
-          <p class="small-note">Sample styles and indicative prices. Please confirm current availability and pricing with us.</p>
+          <p class="small-note">Illustrative sample prices only. Please confirm current prices and availability with us.</p>
+        </div>
+      </section>
+
+      <section class="new-arrivals-section section-padding">
+        <div class="page-width">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">JUST LANDED</p><h2>New arrivals.</h2></div>
+            <a class="text-link" href="collection.html?sort=new">Explore new styles <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="product-grid product-grid-home" data-product-list="new-arrivals" data-limit="4"></div>
+          <p class="small-note">Demo products and prices are illustrative and subject to confirmation with the store.</p>
+        </div>
+      </section>
+
+      <section class="bestsellers-section section-padding">
+        <div class="page-width">
+          <div class="section-heading split-heading">
+            <div><p class="eyebrow">CUSTOMER FAVOURITES</p><h2>Bestsellers.</h2></div>
+            <a class="text-link" href="collection.html?sort=featured">Shop favourites <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="product-grid product-grid-home" data-product-list="bestsellers" data-limit="4"></div>
+          <p class="small-note">Demo products and prices are illustrative and subject to confirmation with the store.</p>
         </div>
       </section>
 
@@ -104,6 +161,25 @@
           <h2>Good style is personal.<br>Good service should be too.</h2>
           <p>Since 1998, Perfect Mens Wear has been helping our community find clothing for workdays, celebrations, and everything in between.</p>
           <a class="button button-outline-light" href="contact.html">A little about us <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="store-visit-section section-padding">
+        <div class="page-width store-visit-grid">
+          <div class="storefront-photo-slot">
+            <img class="storefront-image" data-storefront-image alt="The actual Perfect Mens Wear storefront in Purandar" hidden>
+            <div class="storefront-photo-placeholder" data-storefront-placeholder>
+              <span class="storefront-monogram" aria-hidden="true">PMW</span>
+              <p>A photo of our actual storefront will appear here when supplied.</p>
+            </div>
+          </div>
+          <div class="store-visit-copy">
+            <p class="eyebrow">THE PERFECT MENS WEAR STORE</p>
+            <h2>A familiar place<br>in Purandar.</h2>
+            <p>Visit Perfect Mens Wear for personal help with menswear and fabrics. Proudly serving Purandar, Pune since 1998.</p>
+            <p class="store-visit-address" data-store-address>Purandar, Pune, Maharashtra, India</p>
+            <a class="button button-brown" data-map-link href="https://maps.app.goo.gl/xynNc9MXtxaGUpaV7?g_st=aw" target="_blank" rel="noopener noreferrer">Get directions <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
       </section>
 
@@ -118,8 +194,9 @@
           <div class="centered"><a class="button button-brown" href="collection.html">Start browsing <span aria-hidden="true">↗</span></a></div>
         </div>
       </section>
-    </main>
-    <div id="site-footer"></div>
-    <div id="site-overlays"></div>
+      </main>
+      <div id="site-footer"></div>
+      <div id="site-overlays"></div>
+    </div>
   </body>
 </html>

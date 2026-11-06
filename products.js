@@ -7,8 +7,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 1500,
     mrp: 1800,
     sizes: ["S", "M", "L", "XL"],
+    colors: ["Natural", "Olive", "Navy"],
     image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=900&q=82",
-    tag: "Everyday"
+    tag: "Everyday",
+    bestseller: true
   },
   {
     id: "ray-001",
@@ -18,8 +20,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 1800,
     mrp: null,
     sizes: ["30", "32", "34", "36"],
+    colors: ["Charcoal", "Navy", "Black"],
     image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=900&q=82",
-    tag: ""
+    tag: "",
+    bestseller: true
   },
   {
     id: "siy-001",
@@ -29,8 +33,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 1290,
     mrp: 1590,
     sizes: ["S", "M", "L", "XL"],
+    colors: ["White", "Blue", "Black"],
     image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=82",
-    tag: "Occasion"
+    tag: "Occasion",
+    bestseller: true
   },
   {
     id: "sol-002",
@@ -40,8 +46,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 2200,
     mrp: null,
     sizes: ["S", "M", "L", "XL"],
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=82",
-    tag: "Festive"
+    colors: ["Ivory", "Maroon", "Navy"],
+    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=900&q=82",
+    tag: "Festive",
+    new_arrival: true
   },
   {
     id: "ray-002",
@@ -51,8 +59,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 5800,
     mrp: 6500,
     sizes: ["38", "40", "42", "44"],
-    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=900&q=82",
-    tag: "Tailoring"
+    colors: ["Navy", "Charcoal", "Black"],
+    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=900&q=82",
+    tag: "Tailoring",
+    new_arrival: true
   },
   {
     id: "lc-001",
@@ -62,8 +72,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 1750,
     mrp: null,
     sizes: ["S", "M", "L", "XL"],
+    colors: ["White", "Blue", "Olive"],
     image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=82",
-    tag: ""
+    tag: "",
+    new_arrival: true
   },
   {
     id: "ruby-001",
@@ -73,8 +85,10 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 2400,
     mrp: null,
     sizes: ["By the metre"],
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=82",
-    tag: "Fabric"
+    colors: ["Assorted"],
+    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=82",
+    tag: "Fabric",
+    bestseller: true
   },
   {
     id: "siy-002",
@@ -84,7 +98,9 @@ window.PERFECT_MENS_PRODUCTS = [
     price: 2600,
     mrp: null,
     sizes: ["38", "40", "42", "44"],
+    colors: ["Black", "Navy", "Charcoal"],
     image: "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&w=900&q=82",
-    tag: ""
+    tag: "",
+    new_arrival: true
   }
 ];

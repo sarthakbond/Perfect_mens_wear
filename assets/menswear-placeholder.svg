@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img" aria-labelledby="title description">
+  <title id="title">Menswear image placeholder</title>
+  <desc id="description">A simple illustration of a collared men's shirt.</desc>
+  <rect width="640" height="760" fill="#eee7de"/>
+  <path d="m210 155 84-49h52l84 49 90 60-55 106-54-29v319H229V292l-54 29-55-106z" fill="#3e2420"/>
+  <path d="m294 106 26 47 26-47 38 22-36 98h-56l-36-98z" fill="#faf7f2"/>
+  <path d="m320 153v73m0 43v11m0 35v11m0 35v11m0 35v11m0 35v11m0 35v11" fill="none" stroke="#b8924a" stroke-linecap="round" stroke-width="8"/>
+  <path d="M253 320h41v61h-41zm93 0h41v61h-41z" fill="none" stroke="#b8924a" stroke-width="3"/>
+  <text x="320" y="690" fill="#77716c" font-family="Arial,sans-serif" font-size="18" letter-spacing="3" text-anchor="middle">MENSWEAR IMAGE</text>
+</svg>

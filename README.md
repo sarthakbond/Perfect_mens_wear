@@ -1,16 +1,39 @@
 # Perfect Mens Wear
 
-A lightweight, static three-page menswear site built with HTML, CSS, and vanilla JavaScript. No build step or package installation is required.
+A responsive static storefront built with HTML, CSS, and vanilla JavaScript. No build step or package installation is required.
 
 ## Run locally
 
-Double-click `run-site.bat` on Windows to open the website in your default browser, or open `index.html` directly. No build step or package installation is required. The collection, category filters, order drawer, and saved cart work in the browser. The order flow opens WhatsApp with a pre-filled message; the customer must review and send it.
+Double-click `run-site.bat` on Windows, or serve this folder over HTTP (for example, `py -m http.server 8000`) and open `http://localhost:8000`. The catalogue, filters, product details, saved cart, wishlist, and recently viewed list work in the browser. Order and product enquiries open WhatsApp for the customer to review and send.
 
-## Before publishing
+## Store configuration
 
-1. In `site-config.js`, set the shop's WhatsApp number (country code plus digits, no `+`), phone, and opening hours. The supplied Google Maps shop link is already configured as `mapUrl`.
-2. Replace the sample entries in `products.js` with confirmed products, sizes, prices, and photos. Starter catalog prices are illustrative only.
-3. Replace the remote editorial photos with client-approved shop and product images. Confirm permission before using brand logos or catalogue imagery.
-4. Update the contact location with the exact shop address, then test the order flow on mobile and desktop.
+Edit `site-config.js`:
 
-The site intentionally does not collect or process payments. Availability and final pricing should be confirmed by the store over WhatsApp.
+- Keep the configured store WhatsApp number; replace it only with the owner's confirmed number.
+- Set `phone`, `hours`, and `address` to verified shop information. They are intentionally blank until provided.
+- `mapUrl` and `mapEmbedUrl` use the supplied Google Maps location. The embed point is derived from the existing directions link; replace both values only if the confirmed store listing changes.
+- `storefrontImageUrl` points to the supplied storefront image and is used as the video poster; it is not zoomed or presented as video.
+- Set `storefrontVideoUrl` to the provided intro video, or place it at `assets/storefront-intro.mp4`. The muted video starts playing on the homepage; scrolling, Skip Intro, or the on-screen enter control opens the existing homepage. If playback is blocked, a Play Intro control is shown; if the video is unavailable or unsupported, the intro is skipped.
+- Set `instagramUrl` to the official profile to show the Instagram link.
+
+The website does not make up the street address, contact phone, hours, product availability, or testimonials. The contact page uses the supplied Purandar-area location, and the catalogue is clearly marked as sample data until replaced.
+
+## Supabase admin and live catalogue (optional)
+
+1. Create a Supabase project and run `supabase-setup.sql` in its SQL Editor.
+2. Enable email/password Auth and create the store owner's Auth user. From the SQL Editor, add only that user's Auth ID to the admin allowlist:
+
+   ```sql
+   insert into public.admin_users (user_id)
+   values ('AUTH_USER_UUID');
+   ```
+
+3. Set `supabaseUrl` and the project's **publishable/anon key** in `site-config.js`. This browser key is public by design; row-level security in the supplied SQL is the access control. **Never put a service-role key in frontend code.**
+4. Open `admin.html`, sign in using the authorized account, and add confirmed products, Marathi product names/categories, stock, bestseller/new-arrival flags, categories, gallery photos, store details, and banners. Uploaded images are resized and converted to WebP. The SQL provisions admin-only uploads in the public-read `product-images` bucket.
+
+The admin app uses Supabase Auth and checks the `admin_users` allowlist. Database and Storage policies enforce permissions independently of the page. Customers may optionally consent to saving an order enquiry in Supabase; only store admins can read those records. WhatsApp-only orders are not saved to the dashboard. No payment processing is included.
+
+## Publish
+
+Deploy the folder as a static website over HTTPS (for example, a static host or web server), then follow the store and Supabase setup above. Add the deployed origin to Supabase Auth's allowed redirect/site URL configuration if required by the project. Test the Marathi switcher, WhatsApp links, contact/map details, and (if configured) admin RLS and image uploads before launch.

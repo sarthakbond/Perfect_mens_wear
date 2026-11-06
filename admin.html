@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#3e2420">
+    <title>Store administration | Perfect Mens Wear</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Noto+Serif+Devanagari:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="site-config.js" defer></script>
+    <script src="admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell page-width">
+      <div class="admin-brand-row"><a class="wordmark" href="index.html"><span class="wordmark-mark">PMW</span><span class="wordmark-copy"><strong>PERFECT</strong><small>MENS WEAR · STORE ADMIN</small></span></a><button type="button" class="language-toggle" data-admin-language-toggle aria-label="Switch language">मराठी</button></div>
+      <section class="admin-login" data-admin-login>
+        <p class="eyebrow">SECURE STORE ACCESS</p>
+        <h1>Sign in.</h1>
+        <p>Sign in with an authorized Supabase account. Admin access is enforced by database row-level security.</p>
+        <form data-admin-login-form>
+          <label for="admin-email">Email</label><input id="admin-email" name="email" type="email" autocomplete="username" required>
+          <label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+          <p class="admin-message" data-admin-message role="alert"></p>
+          <button class="button button-brown" type="submit">Sign in</button>
+        </form>
+        <a class="text-link" href="index.html">Return to the store</a>
+      </section>
+      <section class="admin-dashboard" data-admin-dashboard hidden>
+        <header class="admin-dashboard-header">
+          <div><p class="eyebrow">STORE ADMINISTRATION</p><h1>Manage your store.</h1><p data-admin-user></p></div>
+          <button class="button button-outline-admin" type="button" data-admin-signout>Sign out</button>
+        </header>
+        <nav class="admin-tabs" aria-label="Admin sections">
+          <button type="button" data-admin-tab="products" aria-selected="true">Products</button>
+          <button type="button" data-admin-tab="enquiries" aria-selected="false">Order enquiries</button>
+          <button type="button" data-admin-tab="store" aria-selected="false">Store information</button>
+          <button type="button" data-admin-tab="banner" aria-selected="false">Homepage banner</button>
+        </nav>
+        <p class="admin-message" data-dashboard-message role="status"></p>
+        <section class="admin-panel" data-admin-panel="products">
+          <h2>Product catalogue</h2>
+          <form class="admin-product-form" data-product-form>
+            <input type="hidden" name="id">
+            <label>Product name<input name="name" maxlength="120" required></label>
+            <label>Product name (Marathi)<input name="name_mr" maxlength="120"></label>
+            <label>Brand<input name="brand" maxlength="80" required></label>
+            <label>Category<input name="category" maxlength="80" required></label>
+            <label>Category (Marathi)<input name="category_mr" maxlength="80"></label>
+            <label>Price (INR)<input name="price" type="number" min="0" step="1" required></label>
+            <label>MRP (optional)<input name="mrp" type="number" min="0" step="1"></label>
+            <label>Stock quantity<input name="stock" type="number" min="0" step="1" required></label>
+            <label>Sizes (comma-separated)<input name="sizes" placeholder="S, M, L, XL" required></label>
+            <label>Colours (comma-separated)<input name="colors" placeholder="Navy, Black"></label>
+            <label>Tag<input name="tag" maxlength="40"></label>
+            <label>Tag (Marathi)<input name="tag_mr" maxlength="40"></label>
+            <label>Product gallery photos (up to 6)<input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
+            <label class="admin-checkbox"><input name="active" type="checkbox" checked> Visible in the store</label>
+            <label class="admin-checkbox"><input name="bestseller" type="checkbox"> Mark as a bestseller</label>
+            <label class="admin-checkbox"><input name="new_arrival" type="checkbox"> Mark as a new arrival</label>
+            <div class="admin-form-actions"><button class="button button-brown" type="submit">Save product</button><button class="button admin-cancel" type="button" data-product-reset>Clear form</button></div>
+          </form>
+          <div class="admin-table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Visible</th><th>Actions</th></tr></thead><tbody data-product-table></tbody></table></div>
+        </section>
+        <section class="admin-panel" data-admin-panel="enquiries" hidden>
+          <h2>Order enquiries</h2>
+          <p>Enquiries submitted through WhatsApp are not copied to this dashboard. This list displays only enquiries securely submitted to the configured Supabase project.</p>
+          <div class="admin-table-wrap"><table><thead><tr><th>Received</th><th>Customer</th><th>Contact</th><th>Enquiry</th><th>Status</th><th>Actions</th></tr></thead><tbody data-enquiry-table></tbody></table></div>
+        </section>
+        <section class="admin-panel" data-admin-panel="store" hidden>
+          <h2>Store information</h2>
+          <form class="admin-store-form" data-store-form>
+            <label>Store phone<input name="phone" type="tel" maxlength="30"></label>
+            <label>Opening hours<input name="hours" maxlength="160"></label>
+            <label>Full store address<textarea name="address" rows="3" maxlength="300"></textarea></label>
+            <label>Google Maps directions URL<input name="mapUrl" type="url" required></label>
+            <label>Google Maps embed URL (optional)<input name="mapEmbedUrl" type="url"></label>
+            <label>Instagram profile URL (optional)<input name="instagramUrl" type="url"></label>
+            <button class="button button-brown" type="submit">Save store information</button>
+          </form>
+        </section>
+        <section class="admin-panel" data-admin-panel="banner" hidden>
+          <h2>Homepage banner</h2>
+          <form class="admin-banner-form" data-banner-form>
+            <label>Banner title<input name="title" maxlength="120" required></label>
+            <label>Banner title (Marathi)<input name="title_mr" maxlength="120"></label>
+            <label>Image URL<input name="image_url" type="url"></label>
+            <label>Upload a banner image<input name="image" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <label>Store page link (optional)<input name="link_url" type="text" placeholder="collection.html or contact.html"></label>
+            <label class="admin-checkbox"><input name="active" type="checkbox" checked> Publish this banner</label>
+            <button class="button button-brown" type="submit">Save homepage banner</button>
+          </form>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
