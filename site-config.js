@@ -7,10 +7,7 @@ window.PERFECT_MENS_CONFIG = {
   mapUrl: "https://maps.app.goo.gl/xynNc9MXtxaGUpaV7?g_st=aw",
   mapEmbedUrl: "https://maps.google.com/maps?q=18.3468225%2C74.0285926&z=15&output=embed",
   // Set to a verified shop photo URL or local path such as assets/storefront.webp.
-  // The cinematic entrance is skipped until a verified storefront photo is configured.
-  storefrontImageUrl: "assets/storefront-entrance-poster.webp",
-  storefrontVideoUrl: "assets/storefront-entrance-v2.mp4",
-  storefrontVideoMobileUrl: "assets/storefront-mobile-v2.mp4",
+  storefrontImageUrl: "assets/storefront.webp",
   instagramUrl: "",
   supabaseUrl: "",
   supabaseAnonKey: ""

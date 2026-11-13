@@ -13,8 +13,7 @@ Edit `site-config.js`:
 - Keep the configured store WhatsApp number; replace it only with the owner's confirmed number.
 - Set `phone`, `hours`, and `address` to verified shop information. They are intentionally blank until provided.
 - `mapUrl` and `mapEmbedUrl` use the supplied Google Maps location. The embed point is derived from the existing directions link; replace both values only if the confirmed store listing changes.
-- `storefrontImageUrl` points to the supplied storefront image and is used as the video poster; it is not zoomed or presented as video.
-- Set `storefrontVideoUrl` to the provided intro video, or place it at `assets/storefront-intro.mp4`. The muted video starts playing on the homepage; scrolling, Skip Intro, or the on-screen enter control opens the existing homepage. If playback is blocked, a Play Intro control is shown; if the video is unavailable or unsupported, the intro is skipped.
+- `storefrontImageUrl` points to the verified storefront photo (`assets/storefront.webp`) which blends elegantly into the hero section and about section.
 - Set `instagramUrl` to the official profile to show the Instagram link.
 
 The website does not make up the street address, contact phone, hours, product availability, or testimonials. The contact page uses the supplied Purandar-area location, and the catalogue is clearly marked as sample data until replaced.

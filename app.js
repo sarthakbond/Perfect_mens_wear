@@ -250,11 +250,10 @@
       if (document.documentElement.dataset.originalTitle === undefined) document.documentElement.dataset.originalTitle = document.title;
       document.title = t(document.documentElement.dataset.originalTitle);
     }
-    const button = document.querySelector("[data-language-toggle]");
-    if (button) {
+    document.querySelectorAll("[data-language-toggle]").forEach((button) => {
       button.textContent = language === "en" ? "मराठी" : "English";
       button.setAttribute("aria-label", language === "en" ? "Switch language to Marathi" : "Switch language to English");
-    }
+    });
   }
 
   function setLanguage(nextLanguage) {
@@ -312,14 +311,16 @@
             <span class="wordmark-mark">PMW</span>
             <span class="wordmark-copy"><strong>PERFECT</strong><small>MENS WEAR · SINCE 1998</small></span>
           </a>
-          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open menu"><span></span><span></span></button>
           <nav class="primary-nav" id="primary-navigation" aria-label="Main navigation">
             <a class="${activePage === "home" ? "is-active" : ""}" href="index.html">Home</a>
             <a class="${activePage === "collection" ? "is-active" : ""}" href="collection.html">Collection</a>
             <a class="${activePage === "contact" ? "is-active" : ""}" href="contact.html">About &amp; contact</a>
-            <button class="language-toggle" data-language-toggle type="button" aria-label="Switch language to Marathi">मराठी</button>
-            <button class="nav-order cart-open" type="button" aria-label="Open order"><span class="nav-order-label">Your order</span><span class="cart-count" data-cart-count>0</span></button>
           </nav>
+          <div class="nav-actions">
+            <button class="language-pill" data-language-toggle type="button" aria-label="${language === "en" ? "Switch language to Marathi" : "Switch language to English"}">${language === "en" ? "मराठी" : "English"}</button>
+            <button class="nav-order cart-open" type="button" aria-label="Open order"><span class="nav-order-label">Your order</span><span class="cart-count" data-cart-count>0</span></button>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open menu"><span></span><span></span></button>
+          </div>
         </div>
       </header>`;
 
